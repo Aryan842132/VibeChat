@@ -16,11 +16,6 @@ public class JwtConfig {
     @Value("${jwt.expiration}")
     private Long expiration;
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
-
     public String getSecret() {
         return secret;
     }
