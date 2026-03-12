@@ -1,10 +1,12 @@
 package com.vibechat.service;
 
+import com.vibechat.dto.AuthResponse;
 import com.vibechat.dto.LoginRequest;
 import com.vibechat.dto.RegisterRequest;
 import com.vibechat.dto.UserResponse;
 import com.vibechat.model.User;
 import com.vibechat.repository.UserRepository;
+import com.vibechat.util.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -17,8 +19,12 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtTokenProvider jwtTokenProvider;
 
-       public UserResponse register(RegisterRequest request) {
+    /**
+     * Register a new user and return auth response with token
+     */
+    public AuthResponse register(RegisterRequest request) {
         // Validate email uniqueness
         if (userRepository.existsByEmail(request.getEmail())) {
             throw new RuntimeException("Email already exists");
@@ -41,13 +47,22 @@ public class UserService {
         // Save user
         User savedUser = userRepository.save(user);
 
-        return UserResponse.fromEntity(savedUser);
+        // Generate JWT token
+        String token = jwtTokenProvider.generateToken(
+            savedUser.getId(),
+            savedUser.getEmail(),
+            savedUser.getUsername()
+        );
+
+        // Create user response and combine with token
+        UserResponse userResponse = UserResponse.fromEntity(savedUser);
+        return AuthResponse.fromUserResponseWithToken(userResponse, token);
     }
 
     /**
-     * Authenticate user and return user info
+     * Authenticate user and return auth response with JWT token
      */
-    public UserResponse login(LoginRequest request) {
+    public AuthResponse login(LoginRequest request) {
         // Find user by email
         User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new RuntimeException("Invalid email or password"));
@@ -62,7 +77,16 @@ public class UserService {
         user.setLastSeen(LocalDateTime.now());
         userRepository.save(user);
 
-        return UserResponse.fromEntity(user);
+        // Generate JWT token
+        String token = jwtTokenProvider.generateToken(
+            user.getId(),
+            user.getEmail(),
+            user.getUsername()
+        );
+
+        // Create user response and combine with token
+        UserResponse userResponse = UserResponse.fromEntity(user);
+        return AuthResponse.fromUserResponseWithToken(userResponse, token);
     }
 
     public UserResponse getUserById(String id) {

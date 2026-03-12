@@ -11,15 +11,11 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Global exception handler for all controllers
- */
+
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    /**
-     * Handle validation exceptions
-     */
+    
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ApiResponse<Map<String, String>>> handleValidationExceptions(
             MethodArgumentNotValidException ex) {
@@ -40,9 +36,7 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
-    /**
-     * Handle resource not found exceptions
-     */
+    
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<ApiResponse<Void>> handleResourceNotFoundException(
             ResourceNotFoundException ex) {
@@ -56,9 +50,7 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
     }
 
-    /**
-     * Handle validation exceptions
-     */
+    
     @ExceptionHandler(ValidationException.class)
     public ResponseEntity<ApiResponse<Void>> handleValidationException(
             ValidationException ex) {
@@ -72,9 +64,7 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
-    /**
-     * Handle generic runtime exceptions
-     */
+    
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<ApiResponse<Void>> handleRuntimeException(
             RuntimeException ex) {
@@ -88,9 +78,7 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
-    /**
-     * Handle generic exceptions
-     */
+    
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponse<Void>> handleGenericException(
             Exception ex) {

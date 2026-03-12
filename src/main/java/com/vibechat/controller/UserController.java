@@ -1,38 +1,36 @@
 package com.vibechat.controller;
 
 import com.vibechat.dto.ApiResponse;
+import com.vibechat.dto.AuthResponse;
 import com.vibechat.dto.LoginRequest;
 import com.vibechat.dto.RegisterRequest;
 import com.vibechat.dto.UserResponse;
 import com.vibechat.service.UserService;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-/**
- * Controller for user-related endpoints
- */
 @RestController
 @RequestMapping("/api/users")
-@RequiredArgsConstructor
 @CrossOrigin(origins = "*")
 public class UserController {
 
-    private final UserService userService;
+	@Autowired
+    private UserService userService;
 
     @PostMapping("/register")
-    public ResponseEntity<ApiResponse<UserResponse>> register(@Valid @RequestBody RegisterRequest request) {
-        UserResponse user = userService.register(request);
-        return ResponseEntity.ok(ApiResponse.success("User registered successfully", user));
+    public ResponseEntity<ApiResponse<AuthResponse>> register(@Valid @RequestBody RegisterRequest request) {
+        AuthResponse authResponse = userService.register(request);
+        return ResponseEntity.ok(ApiResponse.success("User registered successfully", authResponse));
     }
 
     
     @PostMapping("/login")
-    public ResponseEntity<ApiResponse<UserResponse>> login(@Valid @RequestBody LoginRequest request) {
-        UserResponse user = userService.login(request);
-        return ResponseEntity.ok(ApiResponse.success("Login successful", user));
+    public ResponseEntity<ApiResponse<AuthResponse>> login(@Valid @RequestBody LoginRequest request) {
+        AuthResponse authResponse = userService.login(request);
+        return ResponseEntity.ok(ApiResponse.success("Login successful", authResponse));
     }
 
     
