@@ -23,11 +23,13 @@ public class SecurityConfig {
         http
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
-                
+                // Public endpoints - no authentication required
                 .requestMatchers("/api/users/register", "/api/users/login").permitAll()
-                
+                // Allow public access to get user by ID (for now)
+                .requestMatchers("/api/users/**").permitAll()
+                // WebSocket endpoints
                 .requestMatchers("/ws/**", "/ws").permitAll()
-                
+                // All other API endpoints require authentication
                 .requestMatchers("/api/**").authenticated()
                 .anyRequest().permitAll()
             )
