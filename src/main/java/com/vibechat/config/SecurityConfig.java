@@ -25,8 +25,10 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 // Public endpoints - no authentication required
                 .requestMatchers("/api/users/register", "/api/users/login").permitAll()
-                // Allow public access to get user by ID (for now)
+                // Allow public access to user endpoints
                 .requestMatchers("/api/users/**").permitAll()
+                // Allow public access to upload endpoint (or make authenticated)
+                .requestMatchers("/api/upload/**").permitAll()
                 // WebSocket endpoints
                 .requestMatchers("/ws/**", "/ws").permitAll()
                 // All other API endpoints require authentication

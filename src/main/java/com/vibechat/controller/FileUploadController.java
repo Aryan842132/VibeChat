@@ -11,9 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.UUID;
 
-/**
- * Controller for file upload operations
- */
+
 @RestController
 @RequestMapping("/api/upload")
 @RequiredArgsConstructor
