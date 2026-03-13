@@ -22,13 +22,9 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        // Primary WebSocket endpoint with SockJS fallback
+        // Pure WebSocket endpoint for socket.io client (no SockJS fallback)
+        // Frontend can connect using: new WebSocket('ws://localhost:8080/ws-chat')
         registry.addEndpoint("/ws-chat")
-                .setAllowedOriginPatterns("*")
-                .withSockJS();
-        
-        // Pure WebSocket endpoint for socket.io compatibility (no SockJS)
-        registry.addEndpoint("/ws-chat-socketio")
                 .setAllowedOriginPatterns("*");
     }
 }
