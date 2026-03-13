@@ -3,13 +3,13 @@ package com.vibechat.controller;
 import com.vibechat.dto.ApiResponse;
 import com.vibechat.dto.FileUploadResponse;
 import com.vibechat.service.S3Service;
+import com.vibechat.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.UUID;
 
 
 @RestController
@@ -19,10 +19,12 @@ import java.util.UUID;
 public class FileUploadController {
 
     private final S3Service s3Service;
+    private final UserService userService;
 
     @PostMapping("/profile-picture")
     public ResponseEntity<ApiResponse<FileUploadResponse>> uploadProfilePicture(
-            @RequestParam("file") MultipartFile file) {
+            @RequestParam("file") MultipartFile file,
+            @RequestParam(value = "userId", required = false) String userId) {
         
         try {
             
@@ -34,12 +36,18 @@ public class FileUploadController {
 
             String fileUrl = s3Service.uploadProfilePicture(file);
 
+            // If userId is provided, update the database
+            if (userId != null && !userId.isEmpty()) {
+                userService.updateProfilePicture(userId, fileUrl);
+            }
+
             FileUploadResponse response = FileUploadResponse.builder()
                     .fileName(file.getOriginalFilename())
                     .fileUrl(fileUrl)
                     .fileType(file.getContentType())
                     .fileSize(file.getSize())
-                    .message("Profile picture uploaded successfully")
+                    .message("Profile picture uploaded successfully" + 
+                            (userId != null ? " and saved to database" : ""))
                     .build();
 
             return ResponseEntity.ok(ApiResponse.success("Upload successful", response));
