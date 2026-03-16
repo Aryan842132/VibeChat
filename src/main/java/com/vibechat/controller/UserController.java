@@ -39,4 +39,28 @@ public class UserController {
         UserResponse user = userService.getUserById(id);
         return ResponseEntity.ok(ApiResponse.success("User retrieved successfully", user));
     }
+
+    /**
+     * Search users by name/username
+     * GET /api/users/search?query=john&currentUserId=user-123
+     */
+    @GetMapping("/search")
+    public ResponseEntity<ApiResponse<java.util.List<UserResponse>>> searchUsers(
+            @RequestParam("query") String query,
+            @RequestParam(value = "currentUserId", required = false) String currentUserId) {
+        
+        try {
+            java.util.List<UserResponse> users = userService.searchUsersByName(query, currentUserId);
+
+            return ResponseEntity.ok(ApiResponse.success(
+                "Search completed successfully. Found " + users.size() + " user(s).",
+                users
+            ));
+
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body(
+                ApiResponse.error("Search failed: " + e.getMessage())
+            );
+        }
+    }
 }

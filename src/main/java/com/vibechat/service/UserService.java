@@ -130,4 +130,17 @@ public class UserService {
     public void logout(String userId) {
         updateUserStatus(userId, User.UserStatus.OFFLINE);
     }
+
+    public java.util.List<UserResponse> searchUsersByName(String searchTerm, String currentUserId) {
+        if (searchTerm == null || searchTerm.trim().isEmpty()) {
+            return new java.util.ArrayList<>();
+        }
+
+        java.util.List<User> users = userRepository.findByUsernameContainingIgnoreCase(searchTerm);
+
+        return users.stream()
+                .filter(user -> !user.getId().equals(currentUserId))
+                .map(UserResponse::fromEntity)
+                .toList();
+    }
 }

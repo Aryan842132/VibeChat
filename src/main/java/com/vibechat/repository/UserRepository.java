@@ -6,6 +6,8 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
+import java.util.List;
+
 /**
  * Repository interface for User entity operations
  */
@@ -31,4 +33,10 @@ public interface UserRepository extends MongoRepository<User, String> {
      * Check if username exists
      */
     boolean existsByUsername(String username);
+
+    /**
+     * Search users by username (case-insensitive partial match)
+     * Used for user search functionality
+     */
+    List<User> findByUsernameContainingIgnoreCase(String searchTerm);
 }
