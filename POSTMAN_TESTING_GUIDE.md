@@ -29,6 +29,7 @@ Postman can only test the **REST API endpoints**, not the `@MessageMapping` WebS
 ### Test 1: Get Chat History Between Two Users
 
 #### Endpoint Details
+
 ```
 Method: GET
 URL: http://localhost:8080/api/chat/history/{userId1}/{userId2}
