@@ -31,6 +31,8 @@ public class SecurityConfig {
                 .requestMatchers("/api/upload/**").permitAll()
                 // Allow public access to chat endpoints (for development - add auth in production)
                 .requestMatchers("/api/chat/**").permitAll()
+                // Allow public access to conversation endpoints (for development - add auth in production)
+                .requestMatchers("/api/conversations/**").permitAll()
                 // WebSocket endpoints
                 .requestMatchers("/ws/**", "/ws-chat/**", "/ws-chat").permitAll()
                 // All other API endpoints require authentication

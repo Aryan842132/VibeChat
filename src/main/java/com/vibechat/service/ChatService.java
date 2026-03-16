@@ -17,6 +17,7 @@ public class ChatService {
 
     private final MessageRepository messageRepository;
     private final SimpMessagingTemplate messagingTemplate;
+    private final ConversationService conversationService;
 
     public ChatMessage sendMessage(String senderId, String receiverId, String content, 
                                    ChatMessage.MessageType messageType) {
@@ -30,15 +31,21 @@ public class ChatService {
                 .timestamp(LocalDateTime.now())
                 .build();
 
+        // Save message to database
         ChatMessage savedMessage = messageRepository.save(message);
         log.info("Message saved: {}", savedMessage.getId());
 
+        // Create or update conversation automatically
+        conversationService.updateLastMessage(senderId, receiverId, savedMessage);
+
+        // Send to receiver via WebSocket
         messagingTemplate.convertAndSendToUser(
             receiverId, 
             "/queue/messages", 
             savedMessage
         );
 
+        // Broadcast to public topic
         messagingTemplate.convertAndSend("/topic/messages", savedMessage);
 
         return savedMessage;
