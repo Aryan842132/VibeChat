@@ -40,10 +40,6 @@ public class UserController {
         return ResponseEntity.ok(ApiResponse.success("User retrieved successfully", user));
     }
 
-    /**
-     * Search users by name/username
-     * GET /api/users/search?query=john&currentUserId=user-123
-     */
     @GetMapping("/search")
     public ResponseEntity<ApiResponse<java.util.List<UserResponse>>> searchUsers(
             @RequestParam("query") String query,
