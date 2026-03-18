@@ -1,22 +1,18 @@
 package com.vibechat.controller;
 
-import com.vibechat.dto.ApiResponse;
 import com.vibechat.model.ChatMessage;
 import com.vibechat.service.ChatService;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.messaging.handler.annotation.DestinationVariable;
+
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
-import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.web.bind.annotation.*;
-
-import java.time.LocalDateTime;
-
+import org.springframework.stereotype.Controller;
 
 @Slf4j
-@RestController
+@Controller
 @RequiredArgsConstructor
 public class ChatController {
 
@@ -24,60 +20,72 @@ public class ChatController {
     private final SimpMessagingTemplate messagingTemplate;
 
     @MessageMapping("/chat.send")
-    @SendTo("/topic/messages")
-    public ApiResponse<ChatMessage> sendMessage(@Payload ChatMessage message) {
-        log.info("Received message: from={} to={} content={}", 
-                message.getSenderId(), message.getReceiverId(), message.getContent());
+    public void sendMessage(@Payload ChatMessage message) {
+
+        log.info("PUBLIC: from={} content={}",
+                message.getSenderId(),
+                message.getContent());
 
         ChatMessage savedMessage = chatService.sendMessage(
-            message.getSenderId(),
-            message.getReceiverId(),
-            message.getContent(),
-            message.getMessageType() != null ? message.getMessageType() : ChatMessage.MessageType.TEXT
+                message.getSenderId(),
+                message.getReceiverId(),
+                message.getContent(),
+                message.getMessageType() != null
+                        ? message.getMessageType()
+                        : ChatMessage.MessageType.TEXT
         );
 
-        return ApiResponse.success("Message sent", savedMessage);
+        messagingTemplate.convertAndSend("/topic/messages", savedMessage);
     }
 
-    @MessageMapping("/chat.private.{userId}")
-    public void sendPrivateMessage(
-            @DestinationVariable String userId,
-            @Payload ChatMessage message) {
-        
-        log.info("Private message to {}: {}", userId, message.getContent());
+    @MessageMapping("/chat.private")
+    public void sendPrivateMessage(@Payload ChatMessage message) {
+
+        log.info("PRIVATE: from={} to={} content={}",
+                message.getSenderId(),
+                message.getReceiverId(),
+                message.getContent());
 
         ChatMessage savedMessage = chatService.sendMessage(
-            message.getSenderId(),
-            userId,
-            message.getContent(),
-            message.getMessageType() != null ? message.getMessageType() : ChatMessage.MessageType.TEXT
+                message.getSenderId(),
+                message.getReceiverId(),
+                message.getContent(),
+                message.getMessageType() != null
+                        ? message.getMessageType()
+                        : ChatMessage.MessageType.TEXT
         );
 
-        messagingTemplate.convertAndSendToUser(userId, "/queue/private-message", savedMessage);
+        messagingTemplate.convertAndSendToUser(
+                message.getReceiverId(),
+                "/queue/private",
+                savedMessage
+        );
+
+        messagingTemplate.convertAndSendToUser(
+                message.getSenderId(),
+                "/queue/private",
+                savedMessage
+        );
     }
 
     @MessageMapping("/chat.status")
-    public ApiResponse<ChatMessage> updateMessageStatus(@Payload MessageStatusUpdate statusUpdate) {
-        log.info("Updating message {} status to {}", statusUpdate.getMessageId(), statusUpdate.getStatus());
+    public void updateMessageStatus(@Payload MessageStatusUpdate statusUpdate) {
+
+        log.info("STATUS: messageId={} status={}",
+                statusUpdate.getMessageId(),
+                statusUpdate.getStatus());
 
         ChatMessage updatedMessage = chatService.updateMessageStatus(
-            statusUpdate.getMessageId(),
-            statusUpdate.getStatus()
+                statusUpdate.getMessageId(),
+                statusUpdate.getStatus()
         );
 
-        return ApiResponse.success("Status updated", updatedMessage);
+        messagingTemplate.convertAndSendToUser(
+                updatedMessage.getSenderId(),
+                "/queue/status",
+                updatedMessage
+        );
     }
-
-    
-    @GetMapping("/api/chat/history/{userId1}/{userId2}")
-    public ApiResponse<Iterable<ChatMessage>> getChatHistory(
-            @PathVariable String userId1,
-            @PathVariable String userId2) {
-        
-        Iterable<ChatMessage> messages = chatService.getChatHistory(userId1, userId2);
-        return ApiResponse.success("Chat history retrieved", messages);
-    }
-
     
     @lombok.Data
     @lombok.NoArgsConstructor
