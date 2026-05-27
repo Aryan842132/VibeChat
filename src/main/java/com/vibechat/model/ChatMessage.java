@@ -10,9 +10,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
 
-/**
- * Chat message entity for real-time messaging
- */
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

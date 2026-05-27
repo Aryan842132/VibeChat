@@ -8,9 +8,7 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
-/**
- * DTO for user response - does not expose sensitive data like password
- */
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -31,9 +29,7 @@ public class UserResponse {
 
     private LocalDateTime createdAt;
 
-    /**
-     * Creates UserResponse from User entity
-     */
+    
     public static UserResponse fromEntity(User user) {
         return UserResponse.builder()
                 .id(user.getId())

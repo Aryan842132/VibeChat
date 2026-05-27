@@ -31,14 +31,14 @@ public class ChatService {
                 .timestamp(LocalDateTime.now())
                 .build();
 
-        // Save message to database
+        
         ChatMessage savedMessage = messageRepository.save(message);
         log.info("Message saved: {}", savedMessage.getId());
 
-        // Create or update conversation automatically
+        
         conversationService.updateLastMessage(senderId, receiverId, savedMessage);
 
-        // Send to receiver via WebSocket - using explicit destination path
+        
         log.info("Sending message to user {}: {}", receiverId, savedMessage.getId());
         messagingTemplate.convertAndSend(
             "/user/" + receiverId + "/queue/messages", 
@@ -46,7 +46,7 @@ public class ChatService {
         );
         log.info("Message sent to /user/{}/queue/messages", receiverId);
 
-        // Broadcast to public topic for all subscribers
+        
         messagingTemplate.convertAndSend("/topic/messages", savedMessage);
         log.info("Message broadcasted to /topic/messages");
 

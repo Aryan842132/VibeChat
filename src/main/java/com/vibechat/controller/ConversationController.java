@@ -10,9 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Arrays;
 import java.util.List;
 
-/**
- * REST controller for conversation management
- */
+
 @RestController
 @RequestMapping("/api/conversations")
 @RequiredArgsConstructor
@@ -21,10 +19,7 @@ public class ConversationController {
 
     private final ConversationService conversationService;
 
-    /**
-     * Create a new conversation between users
-     * POST /api/conversations/create
-     */
+    
     @PostMapping("/create")
     public ResponseEntity<ApiResponse<Conversation>> createConversation(
             @RequestBody CreateConversationRequest request) {
@@ -56,10 +51,6 @@ public class ConversationController {
         }
     }
 
-    /**
-     * Get all conversations for a specific user
-     * GET /api/conversations/user/{userId}
-     */
     @GetMapping("/user/{userId}")
     public ResponseEntity<ApiResponse<List<Conversation>>> getUserConversations(
             @PathVariable String userId) {
@@ -79,10 +70,7 @@ public class ConversationController {
         }
     }
 
-    /**
-     * Get conversation by ID
-     * GET /api/conversations/{conversationId}
-     */
+    
     @GetMapping("/{conversationId}")
     public ResponseEntity<ApiResponse<Conversation>> getConversationById(
             @PathVariable String conversationId) {
@@ -104,10 +92,7 @@ public class ConversationController {
         }
     }
 
-    /**
-     * Find or create conversation between two users
-     * GET /api/conversations/between/{userId1}/{userId2}
-     */
+    
     @GetMapping("/between/{userId1}/{userId2}")
     public ResponseEntity<ApiResponse<Conversation>> findOrCreateConversation(
             @PathVariable String userId1,
@@ -130,10 +115,7 @@ public class ConversationController {
         }
     }
 
-    /**
-     * Delete conversation
-     * DELETE /api/conversations/{conversationId}
-     */
+    
     @DeleteMapping("/{conversationId}")
     public ResponseEntity<ApiResponse<Void>> deleteConversation(
             @PathVariable String conversationId) {
@@ -155,9 +137,7 @@ public class ConversationController {
         }
     }
 
-    /**
-     * Request DTO for creating conversations
-     */
+    
     @lombok.Data
     @lombok.NoArgsConstructor
     @lombok.AllArgsConstructor

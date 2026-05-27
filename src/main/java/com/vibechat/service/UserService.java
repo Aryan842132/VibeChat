@@ -20,7 +20,6 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
-    private final S3Service s3Service;
 
     
     public AuthResponse register(RegisterRequest request) {
@@ -96,11 +95,6 @@ public class UserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        if (user.getProfilePicture() != null) {
-            s3Service.deleteProfilePicture(user.getProfilePicture());
-        }
-
-        
         user.setProfilePicture(profilePictureUrl);
         userRepository.save(user);
 

@@ -9,9 +9,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
 
-/**
- * User entity representing a chat application user
- */
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -36,9 +34,6 @@ public class User {
     @CreatedDate
     private LocalDateTime createdAt;
 
-    /**
-     * User status enum for tracking online/offline state
-     */
     public enum UserStatus {
         ONLINE,
         OFFLINE

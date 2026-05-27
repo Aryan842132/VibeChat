@@ -2,14 +2,11 @@ package com.vibechat.controller;
 
 import com.vibechat.dto.ApiResponse;
 import com.vibechat.dto.UserResponse;
-import com.vibechat.service.S3Service;
 import com.vibechat.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.Map;
 
 
@@ -20,43 +17,6 @@ import java.util.Map;
 public class UserProfileController {
 
     private final UserService userService;
-    private final S3Service s3Service;
-
-    
-    @PostMapping("/{userId}/upload-profile-picture")
-    public ResponseEntity<ApiResponse<UserResponse>> uploadAndUpdateProfilePicture(
-            @PathVariable String userId,
-            @RequestParam("file") MultipartFile file) throws IOException {
-        
-        try {
-            
-            if (file.isEmpty()) {
-                return ResponseEntity.badRequest().body(
-                    ApiResponse.error("File cannot be empty")
-                );
-            }
-
-
-            String imageUrl = s3Service.uploadProfilePicture(file);
-
-            
-            UserResponse updatedUser = userService.updateProfilePicture(userId, imageUrl);
-
-            return ResponseEntity.ok(ApiResponse.success(
-                "Profile picture updated successfully", 
-                updatedUser
-            ));
-
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(
-                ApiResponse.error(e.getMessage())
-            );
-        } catch (IOException e) {
-            return ResponseEntity.internalServerError().body(
-                ApiResponse.error("Upload failed: " + e.getMessage())
-            );
-        }
-    }
 
     
     @PutMapping("/{userId}/profile-picture")
